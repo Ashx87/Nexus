@@ -5,11 +5,17 @@ import { route } from './router';
 
 let clientCount = 0;
 
-export function createServer(): WebSocketServer {
-  const wss = new WebSocketServer({ host: config.host, port: config.port });
+interface ServerOptions {
+  readonly port?: number;
+}
+
+export function createServer(options?: ServerOptions): WebSocketServer {
+  const port = options?.port ?? config.port;
+  const wss = new WebSocketServer({ host: config.host, port });
 
   wss.on('listening', () => {
-    console.log(`[server] WebSocket listening on ws://${config.host}:${config.port}`);
+    const addr = wss.address() as { port: number };
+    console.log(`[server] WebSocket listening on ws://${config.host}:${addr.port}`);
   });
 
   wss.on('connection', (ws: WebSocket, req) => {
