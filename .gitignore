@@ -137,3 +137,19 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Expo / React Native generated native directories (managed by expo prebuild)
+client/ios/
+client/android/
+client/.expo/
+client/.metro-cache/
+
+# TypeScript build outputs
+packages/shared/dist/
+server/dist/
+
+# Server packaged executable
+server/*.exe
+
+# Environment files (keep .env.example)
+server/.env
