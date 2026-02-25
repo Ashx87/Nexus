@@ -21,7 +21,7 @@ export function KeyboardScreen({ onDisconnect }: KeyboardScreenProps): React.JSX
           <Text style={styles.headerButtonText}>Disconnect</Text>
         </Pressable>
         <Text style={styles.title}>Keyboard</Text>
-        <View style={styles.headerButton} /> {/* spacer */}
+        <View style={styles.headerButton} />
       </View>
       <KeyboardAvoidingView
         style={styles.content}
