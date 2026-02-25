@@ -195,3 +195,4 @@ Current phase: **Phase 3 complete — starting Phase 4 (Media Control)**. Phases
 - **nut.js Key enum inspection**: `cd server && node -e "const {Key}=require('@nut-tree-fork/nut-js'); console.log(Object.keys(Key).filter(k=>isNaN(Number(k))).join(', '))"` — lists all available keys before building a KEY_MAP.
 - **Tab navigation**: Simple `useState<'tab1' | 'tab2'>` in `App.tsx` works for ≤3 tabs without react-navigation. Add react-navigation only when tabs ≥ 4 or deep linking is needed.
 - **TextInput diff on iOS**: `computeTextDiff(prev, next)` must use `deletedCount = prev.length - prefixLen` (not `Math.max(0, prev.length - next.length)`) to correctly handle mid-string replacement (select+type).
+- **JSX comments in React Native (Fabric)**: `<View />{/* comment */}` NOT `<View /> {/* comment */}` — space before `{/*` is compiled as a text string `" "` and crashes Fabric renderer with "Text strings must be rendered within a <Text> component".
