@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Nexus",
+    "slug": "nexus-client",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.nexus.client",
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "Nexus needs local network access to discover and connect to your Windows PC.",
+        "NSBonjourServices": [
+          "_nexus._tcp"
+        ],
+        "NSAllowsLocalNetworking": true,
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.nexus.client",
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "81803c60-7d1b-419d-a2f0-a8b030f5093b"
+      }
+    }
+  }
+}

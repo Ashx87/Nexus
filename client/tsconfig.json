@@ -1,0 +1,9 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@nexus/shared": ["../packages/shared/dist"]
+    }
+  }
+}
