@@ -49,6 +49,7 @@ export function GestureArea({
 
   const panGesture = useMemo(() =>
     Gesture.Pan().minPointers(1).maxPointers(1)
+      .runOnJS(true)
       .onChange((e: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
         throttledMove(e.changeX, e.changeY);
       }),
@@ -57,6 +58,7 @@ export function GestureArea({
 
   const scrollGesture = useMemo(() =>
     Gesture.Pan().minPointers(2).maxPointers(2)
+      .runOnJS(true)
       .onChange((e: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
         throttledScroll(e.changeY);
       }),
@@ -65,6 +67,7 @@ export function GestureArea({
 
   const doubleTapGesture = useMemo(() =>
     Gesture.Tap().numberOfTaps(2).maxDuration(250)
+      .runOnJS(true)
       .onEnd((_e: GestureStateChangeEvent<TapGestureHandlerEventPayload>, success: boolean) => {
         if (success) onDoubleTap();
       }),
@@ -73,6 +76,7 @@ export function GestureArea({
 
   const singleTapGesture = useMemo(() =>
     Gesture.Tap().numberOfTaps(1).maxDuration(250)
+      .runOnJS(true)
       .requireExternalGestureToFail(doubleTapGesture)
       .onEnd((_e: GestureStateChangeEvent<TapGestureHandlerEventPayload>, success: boolean) => {
         if (success) onTap();
@@ -82,6 +86,7 @@ export function GestureArea({
 
   const twoFingerTapGesture = useMemo(() =>
     Gesture.Tap().minPointers(2)
+      .runOnJS(true)
       .onEnd((_e: GestureStateChangeEvent<TapGestureHandlerEventPayload>, success: boolean) => {
         if (success) onTwoFingerTap();
       }),
