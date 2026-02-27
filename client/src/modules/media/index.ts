@@ -1,3 +1,2 @@
-// Phase 4: Media Control Module
-// Play/pause/volume controls
-export {};
+export { MediaScreen } from './screens/MediaScreen';
+export { useMedia } from './hooks/useMedia';
