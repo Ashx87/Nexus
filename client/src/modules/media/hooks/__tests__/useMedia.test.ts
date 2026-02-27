@@ -1,18 +1,29 @@
-// client/src/modules/media/hooks/__tests__/useMedia.test.ts
+/**
+ * Tests for useMedia hook.
+ *
+ * Because this runs outside a React rendering context (no renderHook available),
+ * we mock:
+ *   - `react` so that useCallback is a plain identity wrapper (no hooks context needed)
+ *   - `wsService.send` to capture outgoing messages
+ */
 
+// ─── Mock wsService ──────────────────────────────────────────────────────────
 jest.mock('../../../../services/WebSocketService', () => ({
   wsService: { send: jest.fn() },
 }));
 
+// ─── Mock React hooks to be no-ops outside a render context ─────────────────
 jest.mock('react', () => ({
   useCallback: (fn: unknown) => fn,
 }));
 
+// ─── Imports (after mocks are registered) ───────────────────────────────────
 import { wsService } from '../../../../services/WebSocketService';
 import { useMedia } from '../useMedia';
 
 const mockSend = wsService.send as jest.Mock;
 
+// ─── Tests ───────────────────────────────────────────────────────────────────
 beforeEach(() => { mockSend.mockClear(); });
 
 describe('useMedia', () => {
