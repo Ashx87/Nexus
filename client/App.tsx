@@ -4,9 +4,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ConnectionScreen } from './src/modules/connection/screens/ConnectionScreen';
 import { TouchpadScreen } from './src/modules/touchpad';
 import { KeyboardScreen } from './src/modules/keyboard';
+import { MediaScreen } from './src/modules/media';
 import { useConnectionStore } from './src/stores/connectionStore';
 
-type ActiveTab = 'touchpad' | 'keyboard';
+type ActiveTab = 'touchpad' | 'keyboard' | 'media';
 
 export default function App(): React.JSX.Element {
   const status = useConnectionStore((s) => s.status);
@@ -25,10 +26,9 @@ export default function App(): React.JSX.Element {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.appContainer}>
         <View style={styles.screenContainer}>
-          {activeTab === 'touchpad'
-            ? <TouchpadScreen onDisconnect={disconnect} />
-            : <KeyboardScreen onDisconnect={disconnect} />
-          }
+          {activeTab === 'touchpad' && <TouchpadScreen onDisconnect={disconnect} />}
+          {activeTab === 'keyboard' && <KeyboardScreen onDisconnect={disconnect} />}
+          {activeTab === 'media'    && <MediaScreen onDisconnect={disconnect} />}
         </View>
         <View style={styles.tabBar}>
           <Pressable
@@ -45,6 +45,14 @@ export default function App(): React.JSX.Element {
           >
             <Text style={[styles.tabText, activeTab === 'keyboard' && styles.tabTextActive]}>
               Keyboard
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.tab, activeTab === 'media' && styles.tabActive]}
+            onPress={() => setActiveTab('media')}
+          >
+            <Text style={[styles.tabText, activeTab === 'media' && styles.tabTextActive]}>
+              Media
             </Text>
           </Pressable>
         </View>
