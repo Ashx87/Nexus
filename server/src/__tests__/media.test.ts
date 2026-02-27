@@ -22,8 +22,8 @@ function createMockWs(): WebSocket {
   return { send: jest.fn(), readyState: 1 } as unknown as WebSocket;
 }
 
-function parseSent(ws: WebSocket): ReturnType<typeof JSON.parse> {
-  return JSON.parse((ws.send as jest.Mock).mock.calls[0][0]);
+function parseSent(ws: WebSocket, callIndex = 0): ReturnType<typeof JSON.parse> {
+  return JSON.parse((ws.send as jest.Mock).mock.calls[callIndex][0]);
 }
 
 describe('handleMediaControl', () => {
@@ -45,6 +45,15 @@ describe('handleMediaControl', () => {
     expect(mockPressKey).toHaveBeenCalledWith(expectedKey);
     expect(mockReleaseKey).toHaveBeenCalledWith(expectedKey);
     expect(ws.send).not.toHaveBeenCalled();
+  });
+
+  test('sends PAYLOAD_INVALID error for an unknown cmd', async () => {
+    const msg = { module: 'media', action: 'control', payload: { cmd: 'eject' } } as unknown as MediaControlMessage;
+    await handleMediaControl(ws, msg);
+    expect(mockPressKey).not.toHaveBeenCalled();
+    expect(ws.send).toHaveBeenCalledTimes(1);
+    const sent = parseSent(ws);
+    expect(sent.payload.code).toBe('PAYLOAD_INVALID');
   });
 
   test('sends INJECTION_FAILED error when pressKey throws', async () => {
