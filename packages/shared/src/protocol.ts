@@ -86,7 +86,28 @@ export type MediaCmd =
 export type MediaControlMessage = NexusMessage<'media', 'control', { cmd: MediaCmd }>;
 
 // ─── Macro module ─────────────────────────────────────────────────────────────
-export type MacroExecuteMessage = NexusMessage<'macro', 'execute', { macroId: string }>;
+export type MacroStepKeyCombo = { readonly type: 'key_combo'; readonly keys: string[]; readonly delay: number };
+export type MacroStepKey = { readonly type: 'key'; readonly key: string; readonly delay: number };
+export type MacroStepTypeText = { readonly type: 'type_text'; readonly text: string; readonly delay: number };
+export type MacroStepWait = { readonly type: 'wait'; readonly ms: number };
+
+export type MacroStep = MacroStepKeyCombo | MacroStepKey | MacroStepTypeText | MacroStepWait;
+
+export interface MacroDefinition {
+  readonly macroId: string;
+  readonly name: string;
+  readonly icon: string;
+  readonly color: string;
+  readonly steps: readonly MacroStep[];
+  readonly isPreset: boolean;
+  readonly order: number;
+}
+
+export const MAX_MACRO_STEPS = 50;
+export const MAX_WAIT_MS = 30_000;
+
+export type MacroExecuteMessage = NexusMessage<'macro', 'execute', { macroId: string; steps: readonly MacroStep[] }>;
+export type MacroResultMessage = NexusMessage<'macro', 'result', { macroId: string; success: boolean; error?: string }>;
 
 // ─── Clipboard module ─────────────────────────────────────────────────────────
 export type ClipboardDirection = 'phone_to_pc' | 'pc_to_phone';
@@ -117,4 +138,5 @@ export type OutboundMessage =
   | AuthResultMessage
   | ErrorMessage
   | ServerInfoMessage
+  | MacroResultMessage
   | ClipboardSyncMessage;
