@@ -1,3 +1,2 @@
-// Phase 5: Shortcuts / Macro Module
-// Preset shortcuts, custom macros, step sequencer
-export {};
+export { MacroScreen } from './screens/MacroScreen';
+export { useMacro } from './hooks/useMacro';

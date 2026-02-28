@@ -5,9 +5,10 @@ import { ConnectionScreen } from './src/modules/connection/screens/ConnectionScr
 import { TouchpadScreen } from './src/modules/touchpad';
 import { KeyboardScreen } from './src/modules/keyboard';
 import { MediaScreen } from './src/modules/media';
+import { MacroScreen } from './src/modules/macro';
 import { useConnectionStore } from './src/stores/connectionStore';
 
-type ActiveTab = 'touchpad' | 'keyboard' | 'media';
+type ActiveTab = 'touchpad' | 'keyboard' | 'media' | 'macro';
 
 export default function App(): React.JSX.Element {
   const status = useConnectionStore((s) => s.status);
@@ -29,6 +30,7 @@ export default function App(): React.JSX.Element {
           {activeTab === 'touchpad' && <TouchpadScreen onDisconnect={disconnect} />}
           {activeTab === 'keyboard' && <KeyboardScreen onDisconnect={disconnect} />}
           {activeTab === 'media'    && <MediaScreen onDisconnect={disconnect} />}
+          {activeTab === 'macro'    && <MacroScreen onDisconnect={disconnect} />}
         </View>
         <View style={styles.tabBar}>
           <Pressable
@@ -53,6 +55,14 @@ export default function App(): React.JSX.Element {
           >
             <Text style={[styles.tabText, activeTab === 'media' && styles.tabTextActive]}>
               Media
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.tab, activeTab === 'macro' && styles.tabActive]}
+            onPress={() => setActiveTab('macro')}
+          >
+            <Text style={[styles.tabText, activeTab === 'macro' && styles.tabTextActive]}>
+              Macros
             </Text>
           </Pressable>
         </View>
