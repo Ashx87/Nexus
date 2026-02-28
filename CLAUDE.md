@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## User Preferences
+
+### Git Commit Strategy
+- **Always make granular commits** — one logical change per commit, never batch unrelated changes together.
+- Example: adding a feature, writing its test, and updating config are separate commits.
+
 ## Project Overview
 
 **Nexus** is an iOS app (React Native) that remotely controls a Windows PC over local Wi-Fi. The iOS client sends commands via WebSocket; the Windows server injects them into the OS using native APIs.
@@ -168,14 +174,14 @@ Macros stored in AsyncStorage and sent to server as JSON:
 
 ## Development Phases
 
-Current phase: **Phase 3 complete — starting Phase 4 (Media Control)**. Phases:
+Current phase: **Phase 5 complete — starting Phase 6 (Clipboard Sync)**. Phases:
 
 0. ✅ Project setup + protocol spec + scaffolding
 1. ✅ Connection Manager (manual IP, auto-reconnect UI, server info — mDNS/pairing deferred)
 2. ✅ Touchpad / Mouse (gestures → cursor, throttle to 60/s)
 3. ✅ Virtual Keyboard (text + function keys + combos + modifier lock)
-4. Media Control (media keys + volume)
-5. Shortcuts / Macros (preset + custom + step sequencer)
+4. ✅ Media Control (media keys + volume)
+5. ✅ Shortcuts / Macros (preset + custom + step sequencer + drag-reorder + import/export)
 6. Clipboard Sync (bi-directional text)
 7. Integration, polish, Windows `.exe` packaging
 
@@ -193,6 +199,9 @@ Current phase: **Phase 3 complete — starting Phase 4 (Media Control)**. Phases
 - **Daily dev uses Expo Go** — no native modules (react-native-zeroconf) until EAS Dev Build is set up.
 - **Zustand + Set mutation**: Creating `new Set(existing)` then calling `.add()`/`.delete()` is a mutation violation even on a fresh Set. Use filter+spread: `new Set([...state.set].filter(k => k !== key))` / `new Set([...state.set, key])`.
 - **nut.js Key enum inspection**: `cd server && node -e "const {Key}=require('@nut-tree-fork/nut-js'); console.log(Object.keys(Key).filter(k=>isNaN(Number(k))).join(', '))"` — lists all available keys before building a KEY_MAP.
-- **Tab navigation**: Simple `useState<'tab1' | 'tab2'>` in `App.tsx` works for ≤3 tabs without react-navigation. Add react-navigation only when tabs ≥ 4 or deep linking is needed.
+- **Tab navigation**: App.tsx currently has 4 tabs (Touchpad, Keyboard, Media, Macros) using simple `useState`. Consider react-navigation if more tabs or deep linking is needed.
+- **Macro execution is fire-and-forget + result callback**: Client sends `MacroExecuteMessage` with full steps, server executes and sends back `MacroResultMessage`. Client listens via `wsService.addMessageHandler` in `useMacro` hook.
+- **react-native-draggable-flatlist** requires `GestureHandlerRootView` (already present in App.tsx). Use `numColumns={2}` for grid layout.
+- **expo-sharing + expo-file-system** for macro import/export — works in Expo Go without native modules.
 - **TextInput diff on iOS**: `computeTextDiff(prev, next)` must use `deletedCount = prev.length - prefixLen` (not `Math.max(0, prev.length - next.length)`) to correctly handle mid-string replacement (select+type).
 - **JSX comments in React Native (Fabric)**: `<View />{/* comment */}` NOT `<View /> {/* comment */}` — space before `{/*` is compiled as a text string `" "` and crashes Fabric renderer with "Text strings must be rendered within a <Text> component".
