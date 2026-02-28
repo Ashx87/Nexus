@@ -2,6 +2,8 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { ServerInfoMessage } from '@nexus/shared';
 import { config } from './config';
 import { route } from './router';
+import { handleBinaryChunk } from './modules/clipboard';
+import { ClipboardWatcher } from './modules/clipboard-watcher';
 
 let clientCount = 0;
 
@@ -31,6 +33,9 @@ export function createServer(options?: ServerOptions): WebSocketServer {
     };
     ws.send(JSON.stringify(serverInfo));
 
+    const clipboardWatcher = new ClipboardWatcher();
+    clipboardWatcher.start(ws);
+
     // WS protocol-level heartbeat: detects broken TCP connections
     let isAlive = true;
     ws.on('pong', () => {
@@ -48,12 +53,17 @@ export function createServer(options?: ServerOptions): WebSocketServer {
       ws.ping();
     }, config.heartbeatTimeout);
 
-    ws.on('message', (data) => {
-      route(ws, data.toString());
+    ws.on('message', (data, isBinary) => {
+      if (isBinary) {
+        handleBinaryChunk(ws, data as Buffer);
+      } else {
+        route(ws, data.toString());
+      }
     });
 
     ws.on('close', () => {
       clearInterval(pingTimer);
+      clipboardWatcher.stop();
       clientCount -= 1;
       console.log(`[server] client disconnected: ${clientIp} (${clientCount} remaining)`);
     });
