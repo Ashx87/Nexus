@@ -111,11 +111,53 @@ export type MacroResultMessage = NexusMessage<'macro', 'result', { macroId: stri
 
 // ─── Clipboard module ─────────────────────────────────────────────────────────
 export type ClipboardDirection = 'phone_to_pc' | 'pc_to_phone';
+export type ClipboardContentType = 'text' | 'image';
+export type ClipboardImageMimeType = 'image/png' | 'image/jpeg';
+
+export const CLIPBOARD_MAX_TEXT_BYTES = 1_048_576;    // 1 MB
+export const CLIPBOARD_MAX_IMAGE_BYTES = 52_428_800;  // 50 MB
+export const CLIPBOARD_CHUNK_SIZE = 65_536;           // 64 KB per binary chunk
+export const CLIPBOARD_POLL_INTERVAL_MS = 1_000;
+export const CLIPBOARD_DEBOUNCE_MS = 500;
+export const CLIPBOARD_TRANSFER_TIMEOUT_MS = 10_000;
+export const CLIPBOARD_MAX_HISTORY = 50;
 
 export type ClipboardSyncMessage = NexusMessage<
   'clipboard',
   'sync',
   { content: string; direction: ClipboardDirection }
+>;
+
+export type ClipboardRequestMessage = NexusMessage<
+  'clipboard',
+  'request',
+  { direction: 'pc_to_phone' }
+>;
+
+export type ClipboardImageMetaMessage = NexusMessage<
+  'clipboard',
+  'image_meta',
+  {
+    transferId: string;
+    direction: ClipboardDirection;
+    mimeType: ClipboardImageMimeType;
+    size: number;
+    width: number;
+    height: number;
+    totalChunks: number;
+  }
+>;
+
+export type ClipboardImageCompleteMessage = NexusMessage<
+  'clipboard',
+  'image_complete',
+  { transferId: string; success: boolean; error?: string }
+>;
+
+export type ClipboardNotifyMessage = NexusMessage<
+  'clipboard',
+  'notify',
+  { type: ClipboardContentType; preview?: string; timestamp: number }
 >;
 
 // ─── Union of all inbound messages (server receives from client) ──────────────
@@ -130,7 +172,10 @@ export type InboundMessage =
   | KeyboardComboMessage
   | MediaControlMessage
   | MacroExecuteMessage
-  | ClipboardSyncMessage;
+  | ClipboardSyncMessage
+  | ClipboardRequestMessage
+  | ClipboardImageMetaMessage
+  | ClipboardImageCompleteMessage;
 
 // ─── Union of all outbound messages (server sends to client) ──────────────────
 export type OutboundMessage =
@@ -139,4 +184,7 @@ export type OutboundMessage =
   | ErrorMessage
   | ServerInfoMessage
   | MacroResultMessage
-  | ClipboardSyncMessage;
+  | ClipboardSyncMessage
+  | ClipboardImageMetaMessage
+  | ClipboardImageCompleteMessage
+  | ClipboardNotifyMessage;
