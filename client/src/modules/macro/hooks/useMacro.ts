@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { MacroDefinition, MacroExecuteMessage } from '@nexus/shared';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { wsService } from '../../../services/WebSocketService';
 import { useMacroStore } from '../../../stores/macroStore';
 

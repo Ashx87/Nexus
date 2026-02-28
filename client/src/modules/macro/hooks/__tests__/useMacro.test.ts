@@ -6,14 +6,25 @@
  * and mock macroStore selectors.
  */
 
+// ─── Mock expo modules (must be before any import that touches them) ────────
+jest.mock('expo-sharing', () => ({
+  shareAsync: jest.fn(),
+}));
+
+jest.mock('expo-file-system/legacy', () => ({
+  cacheDirectory: '/tmp/test/',
+  writeAsStringAsync: jest.fn(),
+}));
+
 // ─── Mock wsService ──────────────────────────────────────────────────────────
 jest.mock('../../../../services/WebSocketService', () => ({
-  wsService: { send: jest.fn() },
+  wsService: { send: jest.fn(), addMessageHandler: jest.fn(() => jest.fn()) },
 }));
 
 // ─── Mock React hooks to be no-ops outside a render context ─────────────────
 jest.mock('react', () => ({
   useCallback: (fn: unknown) => fn,
+  useEffect: () => {},
 }));
 
 // ─── Mock macroStore ────────────────────────────────────────────────────────
