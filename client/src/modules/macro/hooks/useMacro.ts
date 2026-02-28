@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { MacroDefinition, MacroExecuteMessage } from '@nexus/shared';
 import { wsService } from '../../../services/WebSocketService';
 import { useMacroStore } from '../../../stores/macroStore';
@@ -42,6 +42,16 @@ export function useMacro() {
     },
     [deleteMacroFromStore],
   );
+
+  useEffect(() => {
+    const unsubscribe = wsService.addMessageHandler((msg) => {
+      if (msg.module === 'macro' && msg.action === 'result') {
+        const payload = msg.payload as { macroId: string; success: boolean; error?: string };
+        setExecuting(payload.macroId, false);
+      }
+    });
+    return unsubscribe;
+  }, [setExecuting]);
 
   return { executeMacro, createMacro, updateMacro, deleteMacro } as const;
 }
