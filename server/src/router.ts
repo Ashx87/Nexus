@@ -9,7 +9,12 @@ import {
 } from './modules/keyboard';
 import { handleMediaControl } from './modules/media';
 import { handleMacroExecute } from './modules/macro';
-import { handleClipboardSync, handleClipboardRequest } from './modules/clipboard';
+import {
+  handleClipboardSync,
+  handleClipboardRequest,
+  handleClipboardImageMeta,
+  handleClipboardImageComplete,
+} from './modules/clipboard';
 
 function sendError(ws: WebSocket, code: ErrorMessage['payload']['code'], message: string): void {
   const err: ErrorMessage = { module: 'connection', action: 'error', payload: { code, message } };
@@ -63,6 +68,8 @@ export function route(ws: WebSocket, raw: string): void {
     case 'clipboard':
       if (msg.action === 'sync') handleClipboardSync(ws, msg as any);
       else if (msg.action === 'request') handleClipboardRequest(ws, msg as any);
+      else if (msg.action === 'image_meta') handleClipboardImageMeta(ws, msg as any);
+      else if (msg.action === 'image_complete') handleClipboardImageComplete(ws, msg as any);
       break;
 
     default:
