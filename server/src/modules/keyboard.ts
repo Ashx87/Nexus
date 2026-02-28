@@ -4,8 +4,8 @@ import {
   KeyboardTypeMessage,
   KeyboardKeyMessage,
   KeyboardComboMessage,
-  ErrorMessage,
 } from '@nexus/shared';
+import { sendInjectionError, sendPayloadError } from '../utils/errors';
 
 keyboard.config.autoDelayMs = 0;
 
@@ -66,24 +66,6 @@ const KEY_MAP: Record<string, Key> = {
   leftbracket: Key.LeftBracket,
   rightbracket: Key.RightBracket,
 };
-
-function sendInjectionError(ws: WebSocket, detail: string): void {
-  const err: ErrorMessage = {
-    module: 'connection',
-    action: 'error',
-    payload: { code: 'INJECTION_FAILED', message: detail },
-  };
-  ws.send(JSON.stringify(err));
-}
-
-function sendPayloadError(ws: WebSocket, detail: string): void {
-  const err: ErrorMessage = {
-    module: 'connection',
-    action: 'error',
-    payload: { code: 'PAYLOAD_INVALID', message: detail },
-  };
-  ws.send(JSON.stringify(err));
-}
 
 const MAX_TYPE_LENGTH = 1000;
 
