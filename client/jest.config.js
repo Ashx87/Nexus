@@ -7,4 +7,7 @@ module.exports = {
   moduleNameMapper: {
     '^@nexus/shared$': '<rootDir>/../packages/shared/dist',
   },
+  globals: {
+    __DEV__: true,
+  },
 };
