@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { computeTextDiff } from '../utils/textDiff';
+import { useThemeColors } from '../../settings/hooks/useSettings';
 
 interface TextInputAreaProps {
   readonly onType: (text: string) => void;
@@ -10,6 +11,7 @@ interface TextInputAreaProps {
 export function TextInputArea({ onType, onKeyPress }: TextInputAreaProps) {
   const [value, setValue] = useState('');
   const prevValueRef = useRef('');
+  const c = useThemeColors();
 
   const handleChangeText = (next: string) => {
     const diff = computeTextDiff(prevValueRef.current, next);
@@ -27,13 +29,13 @@ export function TextInputArea({ onType, onKeyPress }: TextInputAreaProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: c.surface }]}>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: c.text }]}
         value={value}
         onChangeText={handleChangeText}
         placeholder="Type here to send keystrokes..."
-        placeholderTextColor="#8e8e93"
+        placeholderTextColor={c.textSecondary}
         maxLength={500}
         autoCapitalize="none"
         autoCorrect={false}
@@ -47,13 +49,11 @@ export function TextInputArea({ onType, onKeyPress }: TextInputAreaProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 4,
   },
   input: {
     fontSize: 16,
-    color: '#1c1c1e',
     padding: 12,
     minHeight: 48,
   },

@@ -3,6 +3,7 @@ import { SafeAreaView, StatusBar, View, Text, Pressable, StyleSheet } from 'reac
 import { GestureArea } from '../components/GestureArea';
 import { SensitivitySlider } from '../components/SensitivitySlider';
 import { useTouchpad } from '../hooks/useTouchpad';
+import { useThemeColors } from '../../settings/hooks/useSettings';
 
 interface TouchpadScreenProps {
   readonly onDisconnect: () => void;
@@ -11,6 +12,8 @@ interface TouchpadScreenProps {
 export function TouchpadScreen({ onDisconnect }: TouchpadScreenProps): React.JSX.Element {
   const { sensitivity, setSensitivity, sendMove, sendClick, sendDoubleClick, sendScroll } = useTouchpad();
   const [showSettings, setShowSettings] = useState(false);
+  const c = useThemeColors();
+  const isDark = c.background === '#1c1c1e';
 
   const handleTap = useCallback(() => sendClick('left'), [sendClick]);
   const handleDoubleTap = useCallback(() => sendDoubleClick(), [sendDoubleClick]);
@@ -18,15 +21,15 @@ export function TouchpadScreen({ onDisconnect }: TouchpadScreenProps): React.JSX
   const toggleSettings = useCallback(() => setShowSettings((prev) => !prev), []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={[styles.container, { backgroundColor: c.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <View style={styles.header}>
         <Pressable onPress={onDisconnect} style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Disconnect</Text>
+          <Text style={[styles.headerButtonText, { color: c.primary }]}>Disconnect</Text>
         </Pressable>
-        <Text style={styles.title}>Touchpad</Text>
+        <Text style={[styles.title, { color: c.text }]}>Touchpad</Text>
         <Pressable onPress={toggleSettings} style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>{showSettings ? 'Done' : 'Settings'}</Text>
+          <Text style={[styles.headerButtonText, { color: c.primary }]}>{showSettings ? 'Done' : 'Settings'}</Text>
         </Pressable>
       </View>
       {showSettings ? <SensitivitySlider value={sensitivity} onValueChange={setSensitivity} /> : null}
@@ -43,9 +46,9 @@ export function TouchpadScreen({ onDisconnect }: TouchpadScreenProps): React.JSX
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f2f2f7', padding: 16, gap: 8 },
+  container: { flex: 1, padding: 16, gap: 8 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerButton: { paddingVertical: 6, paddingHorizontal: 12 },
-  headerButtonText: { fontSize: 16, color: '#007aff' },
+  headerButtonText: { fontSize: 16 },
   title: { fontSize: 20, fontWeight: '600' },
 });

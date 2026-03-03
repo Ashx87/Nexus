@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { ConnectionStatus } from '@nexus/shared';
+import { useThemeColors } from '../../settings/hooks/useSettings';
 
 interface ConnectionFormProps {
   readonly host: string;
@@ -31,39 +32,54 @@ export function ConnectionForm({
   onConnect,
   onDisconnect,
 }: ConnectionFormProps): React.JSX.Element {
+  const c = useThemeColors();
   const isConnected = status === 'connected';
   const isBusy = status === 'connecting' || status === 'reconnecting';
   const inputDisabled = isConnected || isBusy;
 
   return (
-    <View style={styles.form}>
+    <View style={[styles.form, { backgroundColor: c.surface }]}>
       {isConnected && serverName ? (
-        <View style={styles.serverInfo}>
-          <Text style={styles.serverName}>{serverName}</Text>
+        <View style={[styles.serverInfo, { borderBottomColor: c.border }]}>
+          <Text style={[styles.serverName, { color: c.text }]}>{serverName}</Text>
           {serverVersion ? (
-            <Text style={styles.serverVersion}>v{serverVersion}</Text>
+            <Text style={[styles.serverVersion, { color: c.textSecondary }]}>v{serverVersion}</Text>
           ) : null}
         </View>
       ) : null}
 
-      <Text style={styles.label}>Server IP</Text>
+      <Text style={[styles.label, { color: c.textSecondary }]}>Server IP</Text>
       <TextInput
-        style={[styles.input, inputDisabled && styles.inputDisabled]}
+        style={[
+          styles.input,
+          { borderColor: c.border, color: c.text },
+          inputDisabled
+            ? { backgroundColor: c.background, color: c.textSecondary }
+            : { backgroundColor: c.background },
+        ]}
         value={host}
         onChangeText={onHostChange}
         placeholder="192.168.1.100"
+        placeholderTextColor={c.textSecondary}
         keyboardType="numbers-and-punctuation"
         autoCapitalize="none"
         autoCorrect={false}
         editable={!inputDisabled}
       />
 
-      <Text style={styles.label}>Port</Text>
+      <Text style={[styles.label, { color: c.textSecondary }]}>Port</Text>
       <TextInput
-        style={[styles.input, inputDisabled && styles.inputDisabled]}
+        style={[
+          styles.input,
+          { borderColor: c.border, color: c.text },
+          inputDisabled
+            ? { backgroundColor: c.background, color: c.textSecondary }
+            : { backgroundColor: c.background },
+        ]}
         value={port}
         onChangeText={onPortChange}
         placeholder="9001"
+        placeholderTextColor={c.textSecondary}
         keyboardType="number-pad"
         editable={!inputDisabled}
       />
@@ -72,8 +88,8 @@ export function ConnectionForm({
         style={[
           styles.button,
           isConnected || isBusy
-            ? styles.buttonDisconnect
-            : styles.buttonConnect,
+            ? { backgroundColor: c.destructive }
+            : { backgroundColor: c.primary },
         ]}
         onPress={isConnected || isBusy ? onDisconnect : onConnect}
         disabled={status === 'connecting'}>
@@ -92,7 +108,6 @@ export function ConnectionForm({
 const styles = StyleSheet.create({
   form: {
     width: '100%',
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
   },
@@ -103,47 +118,31 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e0e0e0',
   },
   serverName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
   },
   serverVersion: {
     fontSize: 13,
-    color: '#999',
     marginLeft: 8,
   },
   label: {
     fontSize: 13,
-    color: '#666',
     marginBottom: 4,
     marginTop: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fafafa',
-  },
-  inputDisabled: {
-    backgroundColor: '#f0f0f0',
-    color: '#999',
   },
   button: {
     marginTop: 20,
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
-  },
-  buttonConnect: {
-    backgroundColor: '#007AFF',
-  },
-  buttonDisconnect: {
-    backgroundColor: '#ff3b30',
   },
   buttonText: {
     color: '#fff',

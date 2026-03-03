@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MODIFIER_KEYS } from '../constants/keys';
+import { useThemeColors } from '../../settings/hooks/useSettings';
 
 interface ModifierBarProps {
   readonly lockedModifiers: ReadonlySet<string>;
@@ -8,6 +9,8 @@ interface ModifierBarProps {
 }
 
 export function ModifierBar({ lockedModifiers, onToggle }: ModifierBarProps) {
+  const c = useThemeColors();
+
   return (
     <View style={styles.row}>
       {MODIFIER_KEYS.map(({ key, label }) => {
@@ -15,10 +18,15 @@ export function ModifierBar({ lockedModifiers, onToggle }: ModifierBarProps) {
         return (
           <Pressable
             key={key}
-            style={[styles.button, locked ? styles.buttonLocked : styles.buttonUnlocked]}
+            style={[
+              styles.button,
+              locked
+                ? { backgroundColor: c.primary }
+                : { backgroundColor: c.surface, borderWidth: 1, borderColor: c.primary },
+            ]}
             onPress={() => onToggle(key)}
           >
-            <Text style={[styles.label, locked ? styles.labelLocked : styles.labelUnlocked]}>
+            <Text style={[styles.label, { color: locked ? '#ffffff' : c.primary }]}>
               {label}
             </Text>
           </Pressable>
@@ -41,22 +49,8 @@ const styles = StyleSheet.create({
     minWidth: 64,
     alignItems: 'center',
   },
-  buttonLocked: {
-    backgroundColor: '#007aff',
-  },
-  buttonUnlocked: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#007aff',
-  },
   label: {
     fontSize: 14,
     fontWeight: '500',
-  },
-  labelLocked: {
-    color: '#ffffff',
-  },
-  labelUnlocked: {
-    color: '#007aff',
   },
 });

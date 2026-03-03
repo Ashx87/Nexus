@@ -1,22 +1,25 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { COMMON_SHORTCUTS } from '../constants/keys';
+import { useThemeColors } from '../../settings/hooks/useSettings';
 
 interface ShortcutsPanelProps {
   readonly onCombo: (keys: string[]) => void;
 }
 
 export function ShortcutsPanel({ onCombo }: ShortcutsPanelProps) {
+  const c = useThemeColors();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: c.background }]}>
       <View style={styles.grid}>
         {COMMON_SHORTCUTS.map((shortcut) => (
           <Pressable
             key={shortcut.label}
-            style={styles.shortcutButton}
+            style={[styles.shortcutButton, { backgroundColor: c.surface, borderColor: c.border }]}
             onPress={() => onCombo(shortcut.keys as string[])}
           >
-            <Text style={styles.shortcutLabel}>{shortcut.label}</Text>
+            <Text style={[styles.shortcutLabel, { color: c.text }]}>{shortcut.label}</Text>
           </Pressable>
         ))}
       </View>
@@ -26,7 +29,6 @@ export function ShortcutsPanel({ onCombo }: ShortcutsPanelProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f2f2f7',
     padding: 4,
   },
   grid: {
@@ -35,16 +37,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   shortcutButton: {
-    backgroundColor: '#ffffff',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#c8c8ce',
   },
   shortcutLabel: {
     fontSize: 14,
-    color: '#1c1c1e',
     fontWeight: '500',
   },
 });

@@ -8,6 +8,7 @@ import { useMacroStore } from '../../../stores/macroStore';
 import { useMacro } from '../hooks/useMacro';
 import { MacroButton } from '../components/MacroButton';
 import { MacroEditor } from '../components/MacroEditor';
+import { useThemeColors } from '../../settings/hooks/useSettings';
 
 interface MacroScreenProps {
   readonly onDisconnect: () => void;
@@ -58,6 +59,9 @@ export function MacroScreen({ onDisconnect }: MacroScreenProps): React.JSX.Eleme
     setEditingMacro(undefined);
   }, []);
 
+  const c = useThemeColors();
+  const isDark = c.background === '#1c1c1e';
+
   const presets = macros.filter((m) => m.isPreset);
   const custom = macros.filter((m) => !m.isPreset);
 
@@ -74,24 +78,24 @@ export function MacroScreen({ onDisconnect }: MacroScreenProps): React.JSX.Eleme
   const keyExtractor = useCallback((item: MacroDefinition) => item.macroId, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={[styles.container, { backgroundColor: c.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <View style={styles.header}>
         <Pressable onPress={onDisconnect} style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Disconnect</Text>
+          <Text style={[styles.headerButtonText, { color: c.primary }]}>Disconnect</Text>
         </Pressable>
-        <Text style={styles.title}>Macros</Text>
+        <Text style={[styles.title, { color: c.text }]}>Macros</Text>
         <Pressable
           onPress={() => { setEditingMacro(undefined); setEditorVisible(true); }}
           style={styles.headerButton}
         >
-          <Text style={styles.headerButtonText}>+</Text>
+          <Text style={[styles.headerButtonText, { color: c.primary }]}>+</Text>
         </Pressable>
       </View>
       <View style={styles.content}>
         {presets.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Shortcuts</Text>
+            <Text style={[styles.sectionLabel, { color: c.textSecondary }]}>Shortcuts</Text>
             <DraggableFlatList
               data={[...presets] as MacroDefinition[]}
               renderItem={renderItem}
@@ -104,7 +108,7 @@ export function MacroScreen({ onDisconnect }: MacroScreenProps): React.JSX.Eleme
         )}
         {custom.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>My Macros</Text>
+            <Text style={[styles.sectionLabel, { color: c.textSecondary }]}>My Macros</Text>
             <DraggableFlatList
               data={[...custom] as MacroDefinition[]}
               renderItem={renderItem}
@@ -128,18 +132,18 @@ export function MacroScreen({ onDisconnect }: MacroScreenProps): React.JSX.Eleme
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f2f2f7' },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingVertical: 8,
   },
   headerButton: { paddingVertical: 6, paddingHorizontal: 12 },
-  headerButtonText: { fontSize: 16, color: '#007aff' },
+  headerButtonText: { fontSize: 16 },
   title: { fontSize: 20, fontWeight: '600' },
   content: { flex: 1, padding: 16, gap: 24 },
   section: { gap: 12 },
   sectionLabel: {
-    fontSize: 13, color: '#8e8e93', fontWeight: '500',
+    fontSize: 13, fontWeight: '500',
     textTransform: 'uppercase', letterSpacing: 0.5,
   },
   gridRow: { justifyContent: 'space-between' },

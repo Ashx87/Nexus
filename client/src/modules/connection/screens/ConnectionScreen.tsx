@@ -4,6 +4,7 @@ import { StatusBadge } from '../components/StatusBadge';
 import { ConnectionForm } from '../components/ConnectionForm';
 import { ReconnectBanner } from '../components/ReconnectBanner';
 import { useConnection } from '../hooks/useConnection';
+import { useThemeColors } from '../../settings/hooks/useSettings';
 
 export function ConnectionScreen(): React.JSX.Element {
   const {
@@ -19,11 +20,13 @@ export function ConnectionScreen(): React.JSX.Element {
     handleConnect,
     handleDisconnect,
   } = useConnection();
+  const c = useThemeColors();
+  const isDark = c.background === '#1c1c1e';
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <Text style={styles.title}>Nexus</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: c.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+      <Text style={[styles.title, { color: c.text }]}>Nexus</Text>
       <StatusBadge status={status} />
 
       {status === 'reconnecting' ? (
@@ -35,7 +38,7 @@ export function ConnectionScreen(): React.JSX.Element {
       ) : null}
 
       {status === 'error' ? (
-        <Text style={styles.errorText}>
+        <Text style={[styles.errorText, { color: c.destructive }]}>
           Connection lost. Tap Connect to retry.
         </Text>
       ) : null}
@@ -51,8 +54,6 @@ export function ConnectionScreen(): React.JSX.Element {
         onConnect={handleConnect}
         onDisconnect={handleDisconnect}
       />
-
-      <Text style={styles.hint}>Phase 1 — Connection Manager</Text>
     </SafeAreaView>
   );
 }
@@ -62,7 +63,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f2f2f7',
     padding: 24,
     gap: 12,
   },
@@ -73,12 +73,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#ff3b30',
     textAlign: 'center',
-  },
-  hint: {
-    fontSize: 12,
-    color: '#bbb',
-    marginTop: 8,
   },
 });
