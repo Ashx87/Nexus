@@ -1,174 +1,176 @@
 # Nexus
 
-**Nexus** 是一款 iOS 应用，通过本地 Wi-Fi 将 iPhone 变成 Windows PC 的无线遥控器。iOS 客户端经由 WebSocket 发送指令，Windows 服务端使用原生 API 将其注入操作系统。
+[中文](README.zh.md)
 
-## 功能特性
+**Nexus** is an iOS app that turns your iPhone into a wireless remote control for your Windows PC over local Wi-Fi. The iOS client sends commands via WebSocket; the Windows server injects them into the OS using native APIs.
 
-| 功能 | 说明 |
-|------|------|
-| **触控板** | 多点触控手势 → 鼠标移动、点击、右键、滚轮 |
-| **虚拟键盘** | 文本输入、功能键（F1–F12）、修饰键锁定（Ctrl/Alt/Shift/Win）、组合键 |
-| **媒体控制** | 播放/暂停、上/下一曲、音量调节、静音 |
-| **宏 / 快捷键** | 内置预设 + 自定义步骤宏、拖拽排序、导入/导出 |
-| **剪贴板同步** | 手机 ↔ PC 双向同步，支持文本与图片，附历史记录 |
-| **系统托盘** | Windows 托盘图标，开机自启，设置界面 |
+## Features
 
-## 架构
+| Feature | Description |
+|---------|-------------|
+| **Touchpad** | Multi-touch gestures → mouse move, click, right-click, scroll |
+| **Virtual Keyboard** | Text input, function keys (F1–F12), modifier lock (Ctrl/Alt/Shift/Win), key combos |
+| **Media Controls** | Play/pause, next/previous track, volume up/down, mute |
+| **Macros / Shortcuts** | Built-in presets + custom step macros, drag-to-reorder, import/export |
+| **Clipboard Sync** | Bi-directional text & image sync between phone and PC, with history |
+| **System Tray** | Windows tray icon, auto-start on login, settings UI |
+
+## Architecture
 
 ```
-iOS 客户端 (React Native)  ←→  WebSocket (JSON)  ←→  Windows 服务端 (Node.js)
+iOS Client (React Native)  <-->  WebSocket (JSON)  <-->  Windows Server (Node.js)
         client/                                              server/
                           packages/shared/
-                        (共享 TypeScript 类型)
+                       (shared TypeScript types)
 ```
 
-三个独立包，各自拥有 `package.json`：
+Three independent packages, each with their own `package.json`:
 
-- **`packages/shared/`** — 双端共用的 TypeScript 类型与常量（需先构建）
-- **`client/`** — React Native iOS 应用（Expo SDK 54）
-- **`server/`** — Node.js Windows 服务
+- **`packages/shared/`** — TypeScript types and constants shared by both sides (must be built first)
+- **`client/`** — React Native iOS app (Expo SDK 54)
+- **`server/`** — Node.js Windows service
 
-## 快速开始
+## Quick Start
 
-### 前置条件
+### Prerequisites
 
-- **服务端**：Node.js 18+（Windows）、cmake（用于 nut.js 原生模块）
-- **客户端**：Node.js 18+、iPhone（安装 Expo Go）或 EAS Dev Build
+- **Server**: Node.js 18+ (Windows), cmake (for nut.js native modules)
+- **Client**: Node.js 18+, iPhone with Expo Go installed, or an EAS Dev Build
 
-### 安装与运行
+### Install & Run
 
 ```bash
-# 1. 安装三个包的依赖
+# 1. Install dependencies for all three packages
 cd packages/shared && npm install
 cd ../server && npm install
 cd ../client && npm install
 
-# 2. 构建共享类型（任何对 protocol.ts 的修改后都需重新构建）
+# 2. Build shared types (required after any change to protocol.ts)
 cd ../packages/shared && npm run build
 
-# 3. 启动服务端（终端 1）
+# 3. Start the server (terminal 1)
 cd ../server && npm run dev
 
-# 4. 启动客户端 Metro（终端 2）
+# 4. Start the client Metro bundler (terminal 2)
 cd ../client && npx expo start
-# → 在 iPhone 上打开 Expo Go → 扫描二维码
+# -> Open Expo Go on your iPhone -> scan the QR code
 ```
 
-### 防火墙配置
+### Firewall
 
-服务端默认监听 **9001 端口**，首次运行需在 Windows 防火墙开放该端口（服务端启动时会打印提示）。
+The server listens on **port 9001** by default. Open this port in Windows Firewall on first run (the server prints a reminder on startup).
 
-## 开发命令
+## Development Commands
 
-### 共享类型
+### Shared types
 
 ```bash
 cd packages/shared
-npm run build        # 构建（修改 protocol.ts 后必须执行）
+npm run build        # rebuild after any change to protocol.ts
 ```
 
-### 服务端
+### Server
 
 ```bash
 cd server
-npm run dev          # ts-node-dev 热重载开发
-npm test             # Jest 单元测试
-npm run build        # 编译至 dist/
-npm run build:exe    # 打包为 nexus-server.exe（pkg）
+npm run dev          # ts-node-dev with hot reload
+npm test             # Jest unit tests
+npm run build        # compile to dist/
+npm run build:exe    # package as nexus-server.exe (pkg)
 ```
 
-### 客户端
+### Client
 
 ```bash
 cd client
-npx expo start                                              # 启动 Metro（Expo Go 扫码）
-npx eas-cli build --profile development --platform ios     # EAS 开发构建（首次）
-npx eas-cli build --profile production --platform ios      # EAS 正式 IPA
+npx expo start                                              # start Metro (scan QR with Expo Go)
+npx eas-cli build --profile development --platform ios     # EAS development build (first time)
+npx eas-cli build --profile production --platform ios      # EAS production IPA
 ```
 
-### 连通性测试
+### Connectivity test
 
 ```bash
-# 服务端运行后执行
+# Run after the server is started
 node server/scripts/test-client.js 127.0.0.1 9001
 ```
 
-## 通信协议
+## Communication Protocol
 
-所有消息通过 WebSocket 以统一 JSON 信封传输：
+All messages are sent over WebSocket as a unified JSON envelope:
 
 ```json
-{ "module": "mouse|keyboard|media|macro|clipboard", "action": "动作名", "payload": {} }
+{ "module": "mouse|keyboard|media|macro|clipboard", "action": "action_name", "payload": {} }
 ```
 
-### 主要消息类型
+### Message Types
 
-| 模块 | 动作 | 载荷 |
-|------|------|------|
+| Module | Action | Payload |
+|--------|--------|---------|
 | `connection` | `ping` / `pong` | `{}` |
 | `connection` | `server_info` | `{ name, version }` |
 | `mouse` | `move` | `{ dx, dy }` |
-| `mouse` | `click` | `{ button: "left\|right\|middle" }` |
+| `mouse` | `click` | `{ button: "left/right/middle" }` |
 | `mouse` | `scroll` | `{ dy }` |
 | `keyboard` | `type` | `{ text }` |
 | `keyboard` | `key` | `{ key }` |
 | `keyboard` | `combo` | `{ keys[] }` |
-| `media` | `control` | `{ cmd: "play_pause\|next\|prev\|volume_up\|volume_down\|mute" }` |
+| `media` | `control` | `{ cmd: "play_pause/next/prev/volume_up/volume_down/mute" }` |
 | `macro` | `execute` | `{ macroId, steps[] }` |
-| `clipboard` | `sync` | `{ content, direction: "phone_to_pc\|pc_to_phone" }` |
+| `clipboard` | `sync` | `{ content, direction: "phone_to_pc/pc_to_phone" }` |
 
-完整类型定义见 [`packages/shared/src/protocol.ts`](packages/shared/src/protocol.ts)。
+Full type definitions: [`packages/shared/src/protocol.ts`](packages/shared/src/protocol.ts)
 
-## 目录结构
+## Directory Structure
 
 ```
 nexus/
 ├── packages/shared/src/
-│   └── protocol.ts          # 所有 WebSocket 消息类型与常量
+│   └── protocol.ts          # All WebSocket message types and constants
 ├── client/src/
 │   ├── modules/
-│   │   ├── connection/      # 连接管理（IP 输入、自动重连 UI）
-│   │   ├── touchpad/        # 触控板手势 → 鼠标事件
-│   │   ├── keyboard/        # 虚拟键盘（文本、功能键、修饰键）
-│   │   ├── media/           # 媒体控制
-│   │   ├── macro/           # 宏管理器（预设 + 自定义 + 步骤编辑器）
-│   │   ├── clipboard/       # 剪贴板同步
-│   │   └── settings/        # 应用设置
+│   │   ├── connection/      # Connection manager (IP input, auto-reconnect UI)
+│   │   ├── touchpad/        # Touch gestures -> mouse events
+│   │   ├── keyboard/        # Virtual keyboard (text, function keys, modifiers)
+│   │   ├── media/           # Media controls
+│   │   ├── macro/           # Macro manager (presets + custom + step editor)
+│   │   ├── clipboard/       # Clipboard sync
+│   │   └── settings/        # App settings
 │   ├── services/
-│   │   └── WebSocketService.ts   # 单例：连接 / 心跳 / 重连
+│   │   └── WebSocketService.ts   # Singleton: connect / heartbeat / reconnect
 │   └── stores/
-│       ├── connectionStore.ts    # Zustand：连接状态
-│       └── keyboardStore.ts      # Zustand：修饰键锁定状态
+│       ├── connectionStore.ts    # Zustand: connection state
+│       └── keyboardStore.ts      # Zustand: modifier lock state
 └── server/src/
-    ├── modules/             # 每个协议模块一个文件
-    ├── server.ts            # WebSocket 服务器生命周期
-    ├── router.ts            # JSON 解析 + 按 module 字段分发
-    ├── discovery.ts         # bonjour-service mDNS 广播
-    └── utils/               # 工具函数
+    ├── modules/             # One file per protocol module
+    ├── server.ts            # WebSocket server lifecycle
+    ├── router.ts            # JSON parse + dispatch by module field
+    ├── discovery.ts         # bonjour-service mDNS broadcast
+    └── utils/               # Utilities
 ```
 
-## 技术栈
+## Tech Stack
 
-| 关注点 | 技术选型 |
-|--------|---------|
-| iOS 客户端 | Expo SDK 54 + React Native 0.81 + TypeScript |
-| iOS 构建 | EAS Build（云端，无需 Mac） |
-| 日常开发 | Expo Go（无需原生模块阶段）|
-| 状态管理 | Zustand |
-| 服务端运行时 | Node.js + TypeScript，`ws` 包 |
-| 鼠标/键盘注入 | `@nut-tree-fork/nut-js` |
-| 媒体音量 | `loudness` |
-| 剪贴板 | `clipboardy` |
-| 服务端打包 | `pkg` → `.exe` + `systray2` 托盘 |
+| Concern | Technology |
+|---------|-----------|
+| iOS Client | Expo SDK 54 + React Native 0.81 + TypeScript |
+| iOS Build | EAS Build (cloud — no Mac required) |
+| Daily Dev | Expo Go (no native modules needed) |
+| State Management | Zustand |
+| Server Runtime | Node.js + TypeScript, `ws` package |
+| Mouse/Keyboard Injection | `@nut-tree-fork/nut-js` |
+| Media Volume | `loudness` |
+| Clipboard | `clipboardy` |
+| Server Packaging | `pkg` -> `.exe` + `systray2` tray |
 
-## 宏数据格式
+## Macro Data Format
 
-宏存储于 AsyncStorage，执行时作为 JSON 发送至服务端：
+Macros are stored in AsyncStorage and sent to the server as JSON at execution time:
 
 ```json
 {
   "macroId": "open_terminal",
-  "name": "打开终端",
+  "name": "Open Terminal",
   "icon": "terminal",
   "color": "#4A90D9",
   "steps": [
@@ -180,6 +182,6 @@ nexus/
 }
 ```
 
-## 许可证
+## License
 
 [MIT](LICENSE)
