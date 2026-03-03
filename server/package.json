@@ -6,7 +6,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest"
+    "test": "jest",
+    "build:exe": "npm run build && npx pkg dist/index.js --config package.json --output nexus-server.exe"
   },
   "dependencies": {
     "@nexus/shared": "file:../packages/shared",
@@ -15,11 +16,21 @@
     "dotenv": "^16.4.0",
     "ws": "^8.17.0"
   },
+  "pkg": {
+    "targets": ["node18-win-x64"],
+    "assets": [
+      "node_modules/@nut-tree-fork/nut-js/**/*.node",
+      "node_modules/@nut-tree-fork/nut-js/**/*.dll",
+      "node_modules/@nut-tree-fork/nut-js/lib/**/*"
+    ],
+    "scripts": ["dist/**/*.js"]
+  },
   "devDependencies": {
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
     "@types/ws": "^8.5.10",
     "jest": "^29.7.0",
+    "pkg": "^5.8.1",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
