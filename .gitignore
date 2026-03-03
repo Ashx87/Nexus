@@ -153,3 +153,7 @@ server/*.exe
 
 # Environment files (keep .env.example)
 server/.env
+
+# Claude Code project files
+.claude/
+CLAUDE.md
