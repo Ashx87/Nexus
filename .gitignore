@@ -157,3 +157,6 @@ server/.env
 # Claude Code project files
 .claude/
 CLAUDE.md
+
+# Internal documentation
+docs/
